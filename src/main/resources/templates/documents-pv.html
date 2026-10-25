@@ -21,7 +21,6 @@
 
 <div class="content">
 
-  <!-- رفع محضر اجتماع جديد (Admin & Directeur) -->
   <div class="panel" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')">
     <div class="panel-title"><i class="ti ti-upload" style="color:var(--copper);"></i> Déposer un nouveau Procès-Verbal (PV)</div>
     <form th:action="@{/documents/upload}" method="post" enctype="multipart/form-data">
@@ -48,7 +47,6 @@
     </form>
   </div>
 
-  <!-- لائحة محاضر الاجتماعات مع التحميل المباشر -->
   <div class="panel">
     <div class="panel-title"><i class="ti ti-folders" style="color:var(--copper);"></i> Archives des Procès-Verbaux</div>
     <table>
@@ -71,7 +69,6 @@
         <td style="font-size:13px;max-width:320px;" th:text="${doc.reunionOrdreDuJour ?: 'Non précisé'}"></td>
         <td style="font-size:12px;color:var(--muted);" th:text="${doc.uploadedBy != null ? doc.uploadedBy.firstName + ' ' + doc.uploadedBy.lastName : 'Direction'}"></td>
         <td style="text-align:right;">
-          <!-- تحميل مباشر بواسطة الـ ID -->
           <a th:href="@{/documents/download/id/{id}(id=${doc.id})}" class="btn btn-secondary btn-sm">
             <i class="ti ti-download"></i> Télécharger le PV
           </a>

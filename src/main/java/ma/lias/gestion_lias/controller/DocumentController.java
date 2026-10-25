@@ -58,7 +58,6 @@ public class DocumentController {
         return "redirect:/documents";
     }
 
-    // تحميل مضمون وآمن بواسطة ID الوثيقة
     @GetMapping("/download/id/{id}")
     public ResponseEntity<Resource> downloadById(@PathVariable Long id) {
         DocumentArchive doc = documentService.getById(id);

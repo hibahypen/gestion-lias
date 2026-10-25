@@ -27,7 +27,6 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        // 1. حسابات النظام الأساسية
         if (memberRepository.findByEmail("admin@lias.ma").isEmpty()) {
             LaboratoryMember admin = new LaboratoryMember();
             admin.setFirstName("Admin");
@@ -62,7 +61,6 @@ public class DataInitializer implements CommandLineRunner {
             mandateRepository.save(mandateDir);
         }
 
-        // 2. تعمير الفرق الـ 5 بالأعضاء والشاف ديال كل فرقة
         seedTeamWithMembers("Data Science & Intelligence Artificielle",
                 "Karim", "El Amrani", "k.elamrani@lias.ma", "Intelligence Artificielle",
                 new String[][]{
@@ -104,7 +102,6 @@ public class DataInitializer implements CommandLineRunner {
 
     private void seedTeamWithMembers(String teamName, String chefFirst, String chefLast, String chefEmail,
                                      String chefSpec, String[][] members) {
-        // التأكد من وجود الفرقة أولاً
         Team team = teamRepository.findByName(teamName).orElseGet(() -> {
             Team t = new Team();
             t.setName(teamName);
@@ -112,7 +109,6 @@ public class DataInitializer implements CommandLineRunner {
             return teamRepository.save(t);
         });
 
-        // 1. إنشاء أو تحديث شيف الفريق
         LaboratoryMember chef = memberRepository.findByEmail(chefEmail).orElseGet(() -> {
             LaboratoryMember m = new LaboratoryMember();
             m.setFirstName(chefFirst);
@@ -129,7 +125,6 @@ public class DataInitializer implements CommandLineRunner {
             return memberRepository.save(m);
         });
 
-        // ربط الشيف مع الفريق فـ Mandat
         if (mandateRepository.findByRoleAndTeamAndActiveTrue(Role.CHEF_EQUIPE, team.getName()).isEmpty()) {
             Mandate mandate = new Mandate();
             mandate.setMember(chef);
@@ -140,7 +135,6 @@ public class DataInitializer implements CommandLineRunner {
             mandateRepository.save(mandate);
         }
 
-        // 2. إنشاء باقي الأعضاء ديال الفرقة
         for (String[] memData : members) {
             String mEmail = memData[2];
             if (memberRepository.findByEmail(mEmail).isEmpty()) {

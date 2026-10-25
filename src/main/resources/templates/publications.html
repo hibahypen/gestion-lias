@@ -34,7 +34,6 @@
     </td>
     <td style="font-size:13px;color:var(--muted);max-width:220px;" th:text="${pub.journal ?: '—'}">Journal</td>
 
-    <!-- الصلاحيات: فقط صاحب المقال أو الأدمين/المدير من يرى أزرار التعديل والمسح -->
     <td style="text-align:right;">
         <div th:if="${(pub.addedBy != null and pub.addedBy.email == #authentication.name) or #authorization.expression('hasAnyRole(''ADMIN'', ''DIRECTEUR'')')}"
              style="display:flex;gap:6px;justify-content:flex-end;">

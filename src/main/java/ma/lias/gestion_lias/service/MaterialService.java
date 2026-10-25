@@ -102,7 +102,6 @@ public class MaterialService {
             }
         }
 
-        // ترتيب FIFO تصاعدي حسب تاريخ الانخراط
         membersWithoutMaterial.sort(Comparator.comparing(
                 LaboratoryMember::getDateAffiliation,
                 Comparator.nullsLast(Comparator.naturalOrder())

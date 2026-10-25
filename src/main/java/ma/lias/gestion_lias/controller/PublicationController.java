@@ -69,7 +69,6 @@ public class PublicationController {
         boolean isGov = auth.getAuthorities().stream().anyMatch(a ->
                 a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_DIRECTEUR"));
 
-        // حماية: إذا ما كانش هو مول المنشور أو مدير/أدمين ما عندوش الحق
         if (!isOwner && !isGov) {
             return "redirect:/publications?unauthorized";
         }
@@ -85,7 +84,6 @@ public class PublicationController {
         boolean isGov = auth.getAuthorities().stream().anyMatch(a ->
                 a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_DIRECTEUR"));
 
-        // حماية: لا يمكن مسح منشورات الآخرين
         if (!isOwner && !isGov) {
             return "redirect:/publications?unauthorized";
         }

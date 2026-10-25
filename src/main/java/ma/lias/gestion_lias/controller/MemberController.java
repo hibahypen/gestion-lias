@@ -34,7 +34,7 @@ public class MemberController {
         LaboratoryMember m = new LaboratoryMember();
         m.setStatus(LaboratoryMember.MemberStatus.PERMANENT);
         model.addAttribute("member", m);
-        model.addAttribute("teams", teamService.getAllTeams()); // <- هادي هي لي كانت ناقصة
+        model.addAttribute("teams", teamService.getAllTeams());
         return "member-form";
     }
 
@@ -52,7 +52,7 @@ public class MemberController {
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Long id, Model model) {
         model.addAttribute("member", memberService.getById(id));
-        model.addAttribute("teams", teamService.getAllTeams()); // <- حتى فـ edit
+        model.addAttribute("teams", teamService.getAllTeams());
         return "member-form";
     }
 

@@ -30,7 +30,6 @@ public class PublicController {
         LocalDate today = LocalDate.now();
         List<ScientificEvent> allEvents = eventRepository.findByArchivedFalse();
 
-        // تقسيم الأحداث: القادمة والسابقة
         List<ScientificEvent> upcomingEvents = allEvents.stream()
                 .filter(e -> e.getEventDate() != null && !e.getEventDate().isBefore(today))
                 .sorted(Comparator.comparing(ScientificEvent::getEventDate))
@@ -53,7 +52,6 @@ public class PublicController {
         model.addAttribute("teams", teamService.getAllTeams());
         model.addAttribute("teamService", teamService);
 
-        // معلومات منسق المسلك Pr. Belaangour
         model.addAttribute("coordNom", "Pr. Belaangour Abderrahim");
         model.addAttribute("coordRole", "Coordinateur du Master Data Science & Big Data");
         model.addAttribute("coordDept", "Faculté des Sciences Ben M'Sik — Département d'Informatique");

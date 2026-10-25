@@ -29,7 +29,6 @@ public class CalendarController {
                 .sorted(Comparator.comparing(ScientificEvent::getEventDate))
                 .toList();
 
-        // تجميع الأحداث حسب الشهور (1 إلى 12)
         Map<Integer, List<ScientificEvent>> eventsByMonth = new LinkedHashMap<>();
         for (int m = 1; m <= 12; m++) {
             final int month = m;

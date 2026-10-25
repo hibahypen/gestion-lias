@@ -21,12 +21,11 @@ public class InternalMessage {
     @JoinColumn(name = "sender_id", nullable = false)
     private LaboratoryMember sender;
 
-    // القناة: إما خاصة بفريق، أو بفعالية، أو نقاش عام بالمختبر
     private String channelType; // "GENERAL", "EQUIPE", "EVENEMENT"
 
-    private String targetTeam;  // اسم الفريق إذا كان channelType = "EQUIPE"
+    private String targetTeam;
 
     @ManyToOne
     @JoinColumn(name = "target_event_id")
-    private ScientificEvent targetEvent; // الفعالية إذا كان channelType = "EVENEMENT"
+    private ScientificEvent targetEvent;
 }

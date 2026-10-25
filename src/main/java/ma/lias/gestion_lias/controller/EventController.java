@@ -29,13 +29,11 @@ public class EventController {
         LocalDate today = LocalDate.now();
         List<ScientificEvent> all = eventService.getAllEvents();
 
-        // 1. الأحداث القادمة (Prévus / À venir)
         List<ScientificEvent> upcoming = all.stream()
                 .filter(e -> e.getEventDate() != null && !e.getEventDate().isBefore(today))
                 .sorted(Comparator.comparing(ScientificEvent::getEventDate))
                 .toList();
 
-        // 2. الأحداث السابقة (Déjà passés / Archives)
         List<ScientificEvent> past = all.stream()
                 .filter(e -> e.getEventDate() != null && e.getEventDate().isBefore(today))
                 .sorted(Comparator.comparing(ScientificEvent::getEventDate).reversed())
