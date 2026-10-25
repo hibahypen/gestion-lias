@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>LIAS - Recherche Globale (§18)</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-header-label">Moteur de recherche (§18)</div>
+      <h1 class="page-header-title">Recherche Globale dans le Laboratoire</h1>
+    </div>
+    <form th:action="@{/search}" method="get" style="display:flex;gap:8px;">
+      <input type="text" name="query" th:value="${query}" placeholder="Rechercher membre, document, événement..." style="padding:10px 14px;border:1px solid var(--border);border-radius:20px;width:320px;">
+      <button type="submit" class="btn btn-gold btn-sm"><i class="ti ti-search"></i> Chercher</button>
+    </form>
+  </div>
+</div>
+
+<div class="content">
+
+  <div th:if="${totalResults != null}" style="margin-bottom:20px;font-size:14px;color:var(--muted);">
+    Résultats trouvés pour « <strong style="color:var(--emerald);" th:text="${query}"></strong> » : <strong th:text="${totalResults}">0</strong> élément(s)
+  </div>
+
+  <!-- 1. Membres -->
+  <div class="panel" th:if="${members != null and !members.isEmpty()}">
+    <div class="panel-title"><i class="ti ti-users" style="color:var(--copper);"></i> Membres du laboratoire (<span th:text="${#lists.size(members)}"></span>)</div>
+    <table>
+      <thead><tr><th>Nom & Prénom</th><th>Email</th><th>Statut</th><th>Équipe</th><th>Spécialité</th></tr></thead>
+      <tbody>
+      <tr th:each="m : ${members}">
+        <td><a th:href="@{/members/view/{id}(id=${m.id})}" style="font-weight:700;color:var(--emerald);text-decoration:none;" th:text="${m.firstName + ' ' + m.lastName}"></a></td>
+        <td th:text="${m.email}"></td>
+        <td><span class="badge badge-permanent" th:text="${m.status}"></span></td>
+        <td th:text="${m.team ?: '—'}"></td>
+        <td th:text="${m.specialite ?: '—'}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. Événements -->
+  <div class="panel" th:if="${events != null and !events.isEmpty()}">
+    <div class="panel-title"><i class="ti ti-calendar-event" style="color:var(--copper);"></i> Événements Scientifiques (<span th:text="${#lists.size(events)}"></span>)</div>
+    <table>
+      <thead><tr><th>Titre</th><th>Type</th><th>Date</th></tr></thead>
+      <tbody>
+      <tr th:each="e : ${events}">
+        <td style="font-weight:700;color:var(--emerald);" th:text="${e.title}"></td>
+        <td><span class="badge badge-conference" th:text="${e.type}"></span></td>
+        <td th:text="${#temporals.format(e.eventDate, 'dd/MM/yyyy')}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. Publications -->
+  <div class="panel" th:if="${publications != null and !publications.isEmpty()}">
+    <div class="panel-title"><i class="ti ti-book" style="color:var(--copper);"></i> Publications Indexées (<span th:text="${#lists.size(publications)}"></span>)</div>
+    <table>
+      <thead><tr><th>Titre</th><th>Type</th><th>Année</th><th>Revue / Conférence</th></tr></thead>
+      <tbody>
+      <tr th:each="p : ${publications}">
+        <td style="font-weight:700;color:var(--emerald);" th:text="${p.title}"></td>
+        <td><span class="badge badge-doctorant" th:text="${p.pubType}"></span></td>
+        <td th:text="${p.pubYear}"></td>
+        <td th:text="${p.journal ?: '—'}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. Documents & PV -->
+  <div class="panel" th:if="${documents != null and !documents.isEmpty()}">
+    <div class="panel-title"><i class="ti ti-archive" style="color:var(--copper);"></i> Documents & PV Archivés (<span th:text="${#lists.size(documents)}"></span>)</div>
+    <table>
+      <thead><tr><th>Titre du document</th><th>Type</th><th>Fichier</th><th>Action</th></tr></thead>
+      <tbody>
+      <tr th:each="d : ${documents}">
+        <td style="font-weight:700;color:var(--emerald);" th:text="${d.title}"></td>
+        <td><span class="badge badge-associe" th:text="${d.docType}"></span></td>
+        <td th:text="${d.fileName}"></td>
+        <td><a th:href="${d.fileDownloadUri}" class="btn btn-secondary btn-sm" download><i class="ti ti-download"></i> Télécharger</a></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:if="${totalResults == 0}" class="panel" style="text-align:center;padding:50px;color:var(--muted);">
+    <i class="ti ti-search-off" style="font-size:42px;display:block;margin-bottom:12px;opacity:0.4;"></i>
+    Aucun résultat trouvé pour votre recherche.
+  </div>
+
+</div>
+
+</body>
+</html>

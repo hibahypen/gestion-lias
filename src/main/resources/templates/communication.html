@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>LIAS - Communication Interne (§13)</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-header-label">Cahier des charges §13</div>
+      <h1 class="page-header-title">Espace d'échange et communication interne</h1>
+    </div>
+  </div>
+</div>
+
+<div class="content" style="display:grid;grid-template-columns:280px 1fr;gap:24px;">
+
+  <!-- القنوات -->
+  <div class="panel" style="margin:0;">
+    <div class="panel-title"><i class="ti ti-hash" style="color:var(--copper);"></i> Canaux d'échange</div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <a th:href="@{/communication(channelType='GENERAL')}"
+         th:style="${channelType == 'GENERAL'} ? 'background:var(--emerald);color:white;' : 'background:var(--sand);color:var(--ink);'"
+         style="padding:10px 14px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;">
+        <i class="ti ti-world"></i> Espace Général Labo
+      </a>
+
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:14px;margin-bottom:4px;">Par Équipe</div>
+      <a th:each="t : ${teams}" th:href="@{/communication(channelType='EQUIPE',team=${t.name})}"
+         th:style="${channelType == 'EQUIPE' and currentTeam == t.name} ? 'background:var(--copper);color:white;' : 'background:var(--sand);color:var(--ink);'"
+         style="padding:8px 12px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;">
+        <i class="ti ti-affiliate"></i> <span th:text="${#strings.abbreviate(t.name, 24)}"></span>
+      </a>
+
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-top:14px;margin-bottom:4px;">Par Événement</div>
+      <a th:each="ev : ${events}" th:href="@{/communication(channelType='EVENEMENT',eventId=${ev.id})}"
+         th:style="${channelType == 'EVENEMENT' and currentEventId == ev.id} ? 'background:#3C3489;color:white;' : 'background:var(--sand);color:var(--ink);'"
+         style="padding:8px 12px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;">
+        <i class="ti ti-calendar-event"></i> <span th:text="${#strings.abbreviate(ev.title, 24)}"></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- المحادثات والرسائل -->
+  <div style="display:flex;flex-direction:column;gap:18px;">
+    <div class="panel" style="margin:0;">
+      <form th:action="@{/communication/post}" method="post">
+        <input type="hidden" name="channelType" th:value="${channelType}">
+        <input type="hidden" name="targetTeam" th:value="${currentTeam}">
+        <input type="hidden" name="targetEventId" th:value="${currentEventId}">
+
+        <div class="form-group" style="margin-bottom:10px;">
+          <textarea name="content" rows="3" required placeholder="Partager une note, idée, mise à jour ou discussion..." style="width:100%;"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;">
+          <button type="submit" class="btn btn-gold btn-sm"><i class="ti ti-send"></i> Publier le message</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="panel" style="margin:0;">
+      <div class="panel-title"><i class="ti ti-messages" style="color:var(--copper);"></i> Fil de discussion</div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:12px;">
+        <div th:each="msg : ${messages}" style="background:var(--sand);padding:14px 18px;border-radius:12px;border-left:4px solid var(--emerald);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="color:var(--emerald);font-size:14px;" th:text="${msg.sender.firstName + ' ' + msg.sender.lastName}"></strong>
+            <span style="font-size:11px;color:var(--muted);" th:text="${#temporals.format(msg.sentAt, 'dd/MM/yyyy HH:mm')}"></span>
+          </div>
+          <div style="font-size:13px;color:var(--ink);line-height:1.6;" th:text="${msg.content}"></div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(messages)}" style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">
+          Aucun message dans ce canal. Soyez le premier à lancer la discussion !
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

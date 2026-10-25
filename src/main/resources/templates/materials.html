@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Matériel & Équipements</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <div class="page-header-label">Logistique & Équipements (§14)</div>
+            <h1 class="page-header-title">Parc Matériel du Laboratoire</h1>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="/materials/requests/new" class="btn btn-secondary"><i class="ti ti-send"></i> Exprimer un besoin</a>
+            <a sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')" href="/materials/new" class="btn btn-gold">
+                <i class="ti ti-plus"></i> Nouvel arrivage
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="panel">
+        <div class="panel-title"><i class="ti ti-package" style="color:var(--copper);"></i> Suivi des arrivages & inventaire</div>
+        <table>
+            <thead>
+            <tr>
+                <th>Désignation</th>
+                <th>Catégorie</th>
+                <th>N° Inventaire</th>
+                <th>Date d'arrivage</th>
+                <th>Stock disponible</th>
+                <th>État</th>
+                <th style="text-align:right;" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="m : ${materials}">
+                <td>
+                    <div style="font-weight:700;color:var(--emerald);" th:text="${m.name}"></div>
+                    <div style="font-size:12px;color:var(--muted);" th:text="${m.description}"></div>
+                </td>
+                <td style="font-size:13px;" th:text="${m.category != null ? m.category : 'Général'}"></td>
+                <td style="font-size:13px;font-family:monospace;" th:text="${m.serialNumber != null ? m.serialNumber : '—'}"></td>
+                <td style="font-size:13px;color:var(--muted);" th:text="${m.arrivalDate != null ? #temporals.format(m.arrivalDate,'dd/MM/yyyy') : '—'}"></td>
+                <td>
+                    <span th:classappend="${m.quantity > 0 ? 'badge-permanent' : 'badge-ancien'}" class="badge"
+                          th:text="${m.quantity + ' en stock'}">0 en stock</span>
+                </td>
+                <td>
+                    <span class="badge badge-associe" th:text="${m.state}">NEUF</span>
+                </td>
+                <td style="text-align:right;" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')">
+                    <div style="display:flex;gap:8px;justify-content:flex-end;">
+                        <a th:href="@{/materials/edit/{id}(id=${m.id})}" class="btn btn-secondary btn-sm"><i class="ti ti-edit"></i></a>
+                        <form method="post" th:action="@{/materials/delete/{id}(id=${m.id})}"  style="display:inline;" onsubmit="return confirm('Supprimer ce matériel ?')"><button type="submit"   class="btn btn-danger btn-sm"><i class="ti ti-trash"></i></button></form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(materials)}">
+                <td colspan="7" style="text-align:center;padding:50px;color:var(--muted);">
+                    <i class="ti ti-package-off" style="font-size:36px;display:block;margin-bottom:10px;opacity:0.3;"></i>
+                    Aucun matériel enregistré pour le moment.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

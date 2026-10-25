@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav th:fragment="navbar" class="navbar" aria-label="Navigation principale">
+    <div class="navbar-left">
+        <a href="/dashboard" class="brand"><div class="brand-icon"><i class="ti ti-flask"></i></div><span>LIAS</span></a>
+        <div class="navlinks">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/publications">Publications</a>
+            <th:block sec:authorize="!hasAuthority('STATUT_DOCTORANT')">
+                <a href="/members" sec:authorize="!hasAuthority('STATUT_ASSOCIE')">Membres</a>
+                <a href="/teams" sec:authorize="!hasAuthority('STATUT_ASSOCIE')">Équipes</a>
+                <a href="/events">Événements</a>
+                <a href="/calendrier">Calendrier</a>
+                <a href="/documents">Documents &amp; PV</a>
+                <a href="/communication">Communication</a>
+                <a href="/conventions">Conventions</a>
+                <a href="/materials/requests">Demandes de matériel</a>
+                <a href="/materials" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')">Matériel</a>
+                <a href="/adhesion-requests" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')">Adhésions</a>
+                <a href="/mandates" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')">Mandats</a>
+                <a href="/reports" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR','VICE_DIRECTEUR')">Rapport annuel</a>
+                <a href="/search">Recherche</a>
+                <a href="/settings" sec:authorize="hasRole('ADMIN')">Paramètres</a>
+            </th:block>
+        </div>
+    </div>
+    <div class="navbar-right">
+        <a href="/profile" class="btn btn-secondary btn-sm">Mon profil</a>
+        <form th:action="@{/logout}" method="post"><button type="submit" class="btn btn-secondary btn-sm">Déconnexion</button></form>
+    </div>
+</nav>
+</body></html>

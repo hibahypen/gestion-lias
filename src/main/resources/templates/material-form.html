@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>LIAS - Fiche Matériel</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-header-label">Inventaire</div>
+      <h1 class="page-header-title">Arrivage de matériel</h1>
+    </div>
+    <a href="/materials" class="btn btn-secondary"><i class="ti ti-arrow-left"></i> Retour</a>
+  </div>
+</div>
+
+<div class="content">
+  <div class="panel" style="max-width:700px;">
+    <form th:action="@{/materials/save}" th:object="${material}" method="post">
+      <input type="hidden" th:field="*{id}">
+      <div class="form-group">
+        <label>Désignation de l'équipement</label>
+        <input type="text" th:field="*{name}" required placeholder="Ex: Serveur Calcul GPU Tesla A100">
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Catégorie</label>
+          <input type="text" th:field="*{category}" placeholder="Ex: Informatique, Réseau...">
+        </div>
+        <div class="form-group">
+          <label>N° Série / Code Inventaire</label>
+          <input type="text" th:field="*{serialNumber}" placeholder="Ex: INV-2026-042">
+        </div>
+        <div class="form-group">
+          <label>Quantité disponible</label>
+          <input type="number" th:field="*{quantity}" min="1" required>
+        </div>
+        <div class="form-group">
+          <label>Date d'arrivage</label>
+          <input type="date" th:field="*{arrivalDate}">
+        </div>
+        <div class="form-group">
+          <label>État du matériel</label>
+          <select th:field="*{state}">
+            <option value="NEUF">Neuf</option>
+            <option value="BON">Bon état</option>
+            <option value="USAGE">Usagé</option>
+            <option value="EN_PANNE">En panne</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description & Spécifications</label>
+        <textarea th:field="*{description}" rows="3" placeholder="Caractéristiques techniques..."></textarea>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button type="submit" class="btn btn-gold"><i class="ti ti-device-floppy"></i> Enregistrer l'arrivage</button>
+        <a href="/materials" class="btn btn-secondary">Annuler</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

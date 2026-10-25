@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Équipes</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <div class="page-header-label">Organisation</div>
+            <h1 class="page-header-title">Gestion des équipes</h1>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a sec:authorize="hasRole('ADMIN')" href="/members/new" class="btn btn-secondary">
+                <i class="ti ti-user-plus"></i> Ajouter un membre
+            </a>
+            <a sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')" th:href="@{/teams/new}" class="btn btn-gold">
+                <i class="ti ti-plus"></i> Nouvelle équipe
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
+        <div class="panel" th:each="team : ${teams}" style="margin:0;display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+                    <div style="width:52px;height:52px;border-radius:14px;background:var(--emerald);color:white;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">
+                        <i class="ti ti-affiliate"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:700;font-size:16px;color:var(--emerald);" th:text="${team.name}">Nom équipe</div>
+                        <div style="font-size:13px;color:var(--copper);font-weight:600;margin-top:2px;">
+                            Chef : <span th:text="${teamService.getChefNom(team.name)}">Non assigné</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px;" th:text="${team.description}">Description</p>
+
+                <!-- عدد الأعضاء وقائمتهم الحالية -->
+                <div style="background:var(--sand);border-radius:10px;padding:12px;margin-bottom:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);">Membres de l'équipe</span>
+                        <span class="badge badge-permanent" style="font-size:11px;" th:text="${teamService.countMembers(team.name)} + ' membres'">0</span>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <div th:each="m : ${teamService.getMembersOfTeam(team.name)}" style="font-size:12px;display:flex;align-items:center;gap:6px;">
+                            <i class="ti ti-user" style="color:var(--emerald);font-size:12px;"></i>
+                            <a th:href="@{/members/view/{id}(id=${m.id})}" style="color:inherit;text-decoration:none;font-weight:600;"
+                               th:text="${m.firstName + ' ' + m.lastName}"></a>
+                            <span style="font-size:10px;color:var(--muted);" th:text="'(' + ${m.status} + ')'"></span>
+                        </div>
+                        <div th:if="${teamService.countMembers(team.name) == 0}" style="font-size:12px;color:var(--muted);font-style:italic;">
+                            Aucun membre affecté pour l'instant.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')" style="display:flex;gap:10px;border-top:1px solid var(--border);padding-top:14px;">
+                <a th:href="@{/teams/edit/{id}(id=${team.id})}" class="btn btn-secondary btn-sm"><i class="ti ti-edit"></i> Modifier</a>
+                <form method="post" th:action="@{/teams/delete/{id}(id=${team.id})}"  style="display:inline;" onsubmit="return confirm('Supprimer cette équipe ?')"><button type="submit"   class="btn btn-danger btn-sm"
+                  ><i class="ti ti-trash"></i></button></form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

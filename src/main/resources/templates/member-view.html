@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>LIAS - Profil membre</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-header-label">Profil</div>
+      <h1 class="page-header-title" th:text="${member.firstName + ' ' + member.lastName}">Nom</h1>
+    </div>
+    <a href="/members" class="btn btn-secondary"><i class="ti ti-arrow-left"></i> Retour</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="panel" style="max-width:900px;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--emerald);color:white;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;overflow:hidden;">
+        <img th:if="${member.photoUrl != null and !member.photoUrl.isEmpty()}" th:src="${member.photoUrl}" style="width:100%;height:100%;object-fit:cover;">
+        <span th:unless="${member.photoUrl != null and !member.photoUrl.isEmpty()}"
+              th:text="${#strings.toUpperCase(#strings.substring(member.firstName,0,1) + #strings.substring(member.lastName,0,1))}">AB</span>
+      </div>
+      <div>
+        <div style="color:var(--muted);font-size:13px;" th:text="${member.email}"></div>
+        <div style="margin-top:6px;">
+          <span class="badge badge-permanent" th:text="${member.status}"></span>
+          <span class="badge badge-associe" th:text="${member.role}"></span>
+          <span th:if="${!member.active}" class="badge badge-ancien">Désactivé</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-grid" style="font-size:14px;">
+      <div><strong>Équipe actuelle :</strong> <span th:text="${member.team != null ? member.team : '—'}"></span></div>
+      <div><strong>Spécialité :</strong> <span th:text="${member.specialite != null ? member.specialite : '—'}"></span></div>
+      <div><strong>Établissement d'origine :</strong> <span th:text="${member.establishmentOrigin != null ? member.establishmentOrigin : '—'}"></span></div>
+      <div><strong>Laboratoire d'origine :</strong> <span th:text="${member.laboratoireOrigine != null ? member.laboratoireOrigine : '—'}"></span></div>
+      <div><strong>Date d'affiliation :</strong> <span th:text="${member.dateAffiliation != null ? #temporals.format(member.dateAffiliation,'dd/MM/yyyy') : '—'}"></span></div>
+      <div><strong>Date d'embauche :</strong> <span th:text="${member.dateEmbauche != null ? #temporals.format(member.dateEmbauche,'dd/MM/yyyy') : '—'}"></span></div>
+      <div style="grid-column:1/-1;"><strong>Centres d'intérêt :</strong> <span th:text="${member.centresInteret != null ? member.centresInteret : '—'}"></span></div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <strong>Biographie</strong>
+      <p style="margin-top:6px;color:var(--muted);" th:text="${member.biography != null ? member.biography : '—'}"></p>
+    </div>
+  </div>
+
+  <div class="panel" style="max-width:900px;margin-top:20px;">
+    <h3 style="margin-bottom:12px;">Historique des affiliations</h3>
+    <table>
+      <thead><tr><th>Début</th><th>Fin</th><th>Laboratoire d'origine</th></tr></thead>
+      <tbody>
+      <tr th:each="a : ${affiliations}">
+        <td th:text="${#temporals.format(a.startDate,'dd/MM/yyyy')}"></td>
+        <td th:text="${a.endDate != null ? #temporals.format(a.endDate,'dd/MM/yyyy') : 'En cours'}"></td>
+        <td th:text="${a.labOrigin != null ? a.labOrigin : '—'}"></td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(affiliations)}"><td colspan="3" style="text-align:center;color:var(--muted);">Aucune période enregistrée</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" style="max-width:900px;margin-top:20px;">
+    <h3 style="margin-bottom:12px;">Publications</h3>
+    <table>
+      <thead><tr><th>Titre</th><th>Type</th><th>Année</th><th>Journal</th></tr></thead>
+      <tbody>
+      <tr th:each="p : ${publications}">
+        <td th:text="${p.title}"></td>
+        <td th:text="${p.pubType != null ? p.pubType : '—'}"></td>
+        <td th:text="${p.pubYear != null ? p.pubYear : '—'}"></td>
+        <td th:text="${p.journal != null ? p.journal : '—'}"></td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(publications)}"><td colspan="4" style="text-align:center;color:var(--muted);">Aucune publication</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" style="max-width:900px;margin-top:20px;" th:if="${canSeeHistory}">
+    <h3 style="margin-bottom:12px;">Historique des changements (profil, statut, rôle, compte)</h3>
+    <table>
+      <thead><tr><th>Date</th><th>Type</th><th>Champ</th><th>Avant</th><th>Après</th><th>Par</th></tr></thead>
+      <tbody>
+      <tr th:each="h : ${history}">
+        <td th:text="${#temporals.format(h.changedAt,'dd/MM/yyyy HH:mm')}"></td>
+        <td><span class="badge badge-associe" th:text="${h.changeType}"></span></td>
+        <td th:text="${h.fieldName}"></td>
+        <td th:text="${h.oldValue != null ? h.oldValue : '—'}"></td>
+        <td th:text="${h.newValue != null ? h.newValue : '—'}"></td>
+        <td th:text="${h.changedBy}"></td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(history)}"><td colspan="6" style="text-align:center;color:var(--muted);">Aucun changement enregistré</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

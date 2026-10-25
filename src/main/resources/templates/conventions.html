@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Conventions & Partenariats</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <div class="page-header-label">Collaborations & Rayonnement (§16)</div>
+            <h1 class="page-header-title">Conventions & Accords de Recherche</h1>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="/conventions/partners" class="btn btn-secondary"><i class="ti ti-building"></i> Gérer Partenaires</a>
+            <a sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')" href="/conventions/new" class="btn btn-gold">
+                <i class="ti ti-plus"></i> Nouvelle convention
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="panel">
+        <table>
+            <thead>
+            <tr>
+                <th>Convention / Titre</th>
+                <th>Partenaire</th>
+                <th>Période</th>
+                <th>Budget (DH)</th>
+                <th>Statut</th>
+                <th>Activités liées</th>
+                <th style="text-align:right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${conventions}">
+                <td>
+                    <a th:href="@{/conventions/view/{id}(id=${c.id})}" style="font-weight:700;color:var(--emerald);text-decoration:none;" th:text="${c.title}"></a>
+                    <div style="font-size:12px;color:var(--muted);max-width:320px;" th:text="${#strings.abbreviate(c.objectives, 70)}"></div>
+                </td>
+                <td>
+                    <strong th:text="${c.partner.name}"></strong>
+                    <div style="font-size:12px;color:var(--muted);" th:text="${c.partner.country + ' (' + c.partner.type + ')'}"></div>
+                </td>
+                <td style="font-size:13px;color:var(--muted);">
+                    <span th:text="${#temporals.format(c.startDate,'dd/MM/yyyy')}"></span>
+                    <i class="ti ti-arrow-right" style="font-size:10px;"></i>
+                    <span th:text="${#temporals.format(c.endDate,'dd/MM/yyyy')}"></span>
+                </td>
+                <td>
+                    <strong style="color:var(--copper);" th:text="${c.budget != null ? #numbers.formatDecimal(c.budget, 0, 'COMMA', 2, 'POINT') + ' DH' : 'Non précisé'}"></strong>
+                </td>
+                <td>
+                    <span th:if="${c.status.name() == 'ACTIVE'}" class="badge badge-permanent">Active</span>
+                    <span th:if="${c.status.name() == 'EXPIREE'}" class="badge badge-ancien">Expirée</span>
+                    <span th:if="${c.status.name() == 'EN_NEGOCIATION'}" class="badge badge-doctorant">En cours</span>
+                    <span th:if="${c.status.name() == 'RESILIEE'}" class="badge badge-associe">Résiliée</span>
+                </td>
+                <td>
+                    <span class="badge badge-doctorant" th:text="${#lists.size(c.associatedEvents)} + ' activité(s)'"></span>
+                </td>
+                <td style="text-align:right;">
+                    <div style="display:flex;gap:6px;justify-content:flex-end;">
+                        <a th:href="@{/conventions/view/{id}(id=${c.id})}" class="btn btn-secondary btn-sm"><i class="ti ti-eye"></i></a>
+                        <a sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')" th:href="@{/conventions/edit/{id}(id=${c.id})}" class="btn btn-secondary btn-sm"><i class="ti ti-edit"></i></a>
+                        <form method="post" th:action="@{/conventions/delete/{id}(id=${c.id})}" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')" style="display:inline;" onsubmit="return confirm('Supprimer cette convention ?')"><button type="submit"    class="btn btn-danger btn-sm"><i class="ti ti-trash"></i></button></form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(conventions)}">
+                <td colspan="7" style="text-align:center;padding:50px;color:var(--muted);">
+                    <i class="ti ti-folder-off" style="font-size:36px;display:block;margin-bottom:10px;opacity:0.3;"></i>
+                    Aucune convention enregistrée.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

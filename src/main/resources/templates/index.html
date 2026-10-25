@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIAS Lab - Excellence en Recherche & Big Data</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav class="pubnav">
+    <a href="/" class="brand">
+        <div class="brand-icon"><i class="ti ti-flask"></i></div>
+        <span>LIAS LAB</span>
+    </a>
+    <div class="pubnav-links">
+        <a href="/" class="active">Accueil</a>
+        <a href="/equipes">Équipes</a>
+        <a href="/activites">Activités</a>
+        <a href="/publications-publiques">Publications</a>
+    </div>
+    <div style="display:flex;gap:10px;">
+        <a href="/adhesion" class="btn btn-secondary btn-sm" style="background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.25);">
+            <i class="ti ti-user-plus"></i> Rejoindre le labo
+        </a>
+        <a href="/login" class="login-btn">Espace Membre</a>
+    </div>
+</nav>
+
+<header class="hero-organic">
+    <div class="hero-content">
+        <div class="hero-eyebrow">Faculté des Sciences Ben M'Sik · Université Hassan II Casablanca</div>
+        <h1 class="hero-pub-title">Laboratoire d'Informatique et d'Aide à la Décision</h1>
+        <p class="hero-pub-sub">Pôle d'excellence en Data Science, Intelligence Artificielle et Systèmes Distribués. Valorisation de la recherche scientifique et structuration des compétences.</p>
+        <div class="hero-cta">
+            <a href="#coordinateur" class="cta-secondary"><i class="ti ti-user"></i> Direction & Coordination</a>
+            <a href="/adhesion" class="cta-primary"><i class="ti ti-send"></i> Déposer une candidature</a>
+        </div>
+    </div>
+</header>
+
+<!-- شريط المؤشرات التفاعلي -->
+<div class="ticker">
+    <div class="ticker-track">
+        <div class="ticker-item"><i class="ti ti-award"></i> Master Data Science & Big Data</div>
+        <div class="ticker-item"><i class="ti ti-users"></i> Plus de <span th:text="${nbMembres}">0</span> Chercheurs & Doctorants</div>
+        <div class="ticker-item"><i class="ti ti-device-analytics"></i> <span th:text="${nbTeams}">0</span> Équipes Thématiques</div>
+        <div class="ticker-item"><i class="ti ti-books"></i> <span th:text="${nbPublications}">0</span> Articles & Publications Indexées</div>
+        <div class="ticker-item"><i class="ti ti-calendar"></i> <span th:text="${nbEvents}">0</span> Événements Scientifiques Réalisés</div>
+    </div>
+</div>
+
+<div class="content" style="max-width:1200px;margin:50px auto;padding:0 20px;">
+
+    <!-- 1. بطاقة الأستاذ منسق المسلك والمختبر -->
+    <section id="coordinateur" class="panel" style="background:linear-gradient(135deg, #ffffff 0%, #f7f9f8 100%);border:2px solid var(--border);border-left:6px solid var(--copper);padding:32px;margin-bottom:40px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;">
+            <div style="display:flex;gap:24px;align-items:center;">
+                <div style="width:90px;height:90px;border-radius:50%;background:var(--emerald);color:white;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;box-shadow:0 10px 25px rgba(14,59,46,0.18);flex-shrink:0;">
+                    BA
+                </div>
+                <div>
+                    <span class="badge badge-permanent" style="font-size:11px;margin-bottom:6px;"><i class="ti ti-certificate"></i> Direction Pédagogique & Scientifique</span>
+                    <h2 style="font-size:24px;color:var(--emerald);margin:4px 0;" th:text="${coordNom}">Pr. Belaangour Abderrahim</h2>
+                    <div style="font-weight:600;color:var(--copper);font-size:14px;" th:text="${coordRole}">Coordinateur du Master Data Science & Big Data</div>
+                    <div style="color:var(--muted);font-size:13px;margin-top:4px;" th:text="${coordDept}">Faculté des Sciences Ben M'Sik</div>
+                </div>
+            </div>
+
+            <!-- معلومات الاتصال بالمنسق -->
+            <div style="background:white;padding:18px 24px;border-radius:14px;border:1px solid var(--border);display:flex;flex-direction:column;gap:10px;min-width:280px;">
+                <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Contact & Permanence</div>
+                <div style="font-size:13px;display:flex;align-items:center;gap:10px;">
+                    <i class="ti ti-mail" style="color:var(--copper);font-size:16px;"></i>
+                    <a th:href="'mailto:' + ${coordEmail}" style="color:var(--emerald);text-decoration:none;font-weight:600;" th:text="${coordEmail}">email</a>
+                </div>
+                <div style="font-size:13px;display:flex;align-items:center;gap:10px;">
+                    <i class="ti ti-phone" style="color:var(--copper);font-size:16px;"></i>
+                    <span th:text="${coordTel}">téléphone</span>
+                </div>
+                <div style="font-size:13px;display:flex;align-items:center;gap:10px;">
+                    <i class="ti ti-building" style="color:var(--copper);font-size:16px;"></i>
+                    <span th:text="${coordBureau}">bureau</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. قسم الأحداث: القادمة المبرمجة والسابقة المنتهية -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:40px;">
+
+        <!-- أحداث قادمة -->
+        <div class="panel" style="margin:0;">
+            <div class="panel-title" style="color:#2D6A0A;">
+                <i class="ti ti-calendar-time"></i> Événements Prévus & À Venir
+            </div>
+            <div class="event-pub-list" style="margin-top:16px;">
+                <div class="event-pub-item" th:each="event : ${upcomingEvents}">
+                    <div class="event-pub-date" style="background:#2D6A0A;">
+                        <div class="day" th:text="${#temporals.format(event.eventDate, 'dd')}">12</div>
+                        <div class="month" th:text="${#temporals.format(event.eventDate, 'MMM')}">MAI</div>
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:700;color:var(--emerald);font-size:14px;" th:text="${event.title}">Titre de la conférence</div>
+                        <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+                            <span class="badge badge-permanent" style="font-size:10px;" th:text="${event.type}">TYPE</span>
+                            <span style="font-size:11px;color:var(--muted);" th:text="${#temporals.format(event.eventDate, 'dd/MM/yyyy')}">Date</span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(upcomingEvents)}" style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">
+                    Aucun événement futur programmé pour le moment.
+                </div>
+            </div>
+        </div>
+
+        <!-- أحداث سابقة -->
+        <div class="panel" style="margin:0;">
+            <div class="panel-title" style="color:var(--muted);">
+                <i class="ti ti-history"></i> Événements Réalisés (Archives)
+            </div>
+            <div class="event-pub-list" style="margin-top:16px;">
+                <div class="event-pub-item" th:each="event : ${pastEvents}" style="opacity:0.85;background:#fcfbf9;">
+                    <div class="event-pub-date" style="background:#6B7280;">
+                        <div class="day" th:text="${#temporals.format(event.eventDate, 'dd')}">05</div>
+                        <div class="month" th:text="${#temporals.format(event.eventDate, 'MMM')}">JAN</div>
+                    </div>
+                    <div style="flex:1;">
+                        <div style="font-weight:600;color:var(--ink);font-size:14px;" th:text="${event.title}">Titre séminaire</div>
+                        <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+                            <span class="badge badge-retraite" style="font-size:10px;" th:text="${event.type}">TYPE</span>
+                            <span style="font-size:11px;color:var(--muted);" th:text="'Clôturé le ' + ${#temporals.format(event.eventDate, 'dd/MM/yyyy')}">Date</span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(pastEvents)}" style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">
+                    Aucun événement passé archivé.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. نظرة عامة على الفرق البحثية المتاحة -->
+    <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <div class="panel-title" style="margin:0;">
+                <i class="ti ti-affiliate" style="color:var(--copper);"></i> Équipes de Recherche du Laboratoire
+            </div>
+            <a href="/equipes" class="btn btn-secondary btn-sm">Voir toutes les équipes <i class="ti ti-arrow-right"></i></a>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:18px;">
+            <div class="member-pub-card" style="text-align:left;padding:20px;" th:each="team : ${teams}">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                    <div style="width:40px;height:40px;border-radius:10px;background:var(--sand);color:var(--copper);display:flex;align-items:center;justify-content:center;font-size:18px;">
+                        <i class="ti ti-bulb"></i>
+                    </div>
+                    <div style="font-weight:700;color:var(--emerald);font-size:15px;" th:text="${team.name}">Nom équipe</div>
+                </div>
+                <p style="font-size:12px;color:var(--muted);line-height:1.6;" th:text="${#strings.abbreviate(team.description, 90)}"></p>
+                <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+                    <span class="badge badge-doctorant" style="font-size:11px;" th:text="${teamService.countMembers(team.name)} + ' chercheurs'">0</span>
+                    <span style="font-size:11px;color:var(--muted);" th:text="'Chef: ' + ${teamService.getChefNom(team.name)}">Chef</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="footer-pub">
+    <div class="container">
+        <p><strong>Laboratoire d'Informatique et d'Aide à la Décision (LIAS)</strong></p>
+        <p>Faculté des Sciences Ben M'Sik — Master Data Science & Big Data</p>
+        <p style="margin-top:8px;font-size:11px;color:var(--muted);">Université Hassan II de Casablanca — BP 7955 Sidi Othman, Casablanca</p>
+    </div>
+</footer>
+
+</body>
+</html>

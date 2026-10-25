@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>LIAS - Procès-Verbaux de Réunions (§17)</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-header-label">Cahier des charges §17</div>
+      <h1 class="page-header-title">Procès-Verbaux (PV) & Ordres du Jour</h1>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- رفع محضر اجتماع جديد (Admin & Directeur) -->
+  <div class="panel" sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')">
+    <div class="panel-title"><i class="ti ti-upload" style="color:var(--copper);"></i> Déposer un nouveau Procès-Verbal (PV)</div>
+    <form th:action="@{/documents/upload}" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="docType" value="PV_REUNION">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Intitulé de la réunion</label>
+          <input type="text" name="title" required placeholder="Ex: PV Réunion de rentrée doctorale 2026">
+        </div>
+        <div class="form-group">
+          <label>Date de la réunion</label>
+          <input type="date" name="docDate" required>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label>Ordre du jour de la réunion (§17)</label>
+          <textarea name="ordreDuJour" rows="2" required placeholder="Points abordés, décisions prises..."></textarea>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label>Fichier du PV signé (PDF / Word)</label>
+          <input type="file" name="file" required style="padding:8px;">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-gold"><i class="ti ti-device-floppy"></i> Enregistrer et archiver le PV</button>
+    </form>
+  </div>
+
+  <!-- لائحة محاضر الاجتماعات مع التحميل المباشر -->
+  <div class="panel">
+    <div class="panel-title"><i class="ti ti-folders" style="color:var(--copper);"></i> Archives des Procès-Verbaux</div>
+    <table>
+      <thead>
+      <tr>
+        <th>Réunion / Intitulé du PV</th>
+        <th>Date</th>
+        <th>Ordre du jour</th>
+        <th>Déposé par</th>
+        <th style="text-align:right;">Téléchargement</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="doc : ${documents}">
+        <td>
+          <strong style="color:var(--emerald);" th:text="${doc.title}"></strong>
+          <div style="font-size:11px;color:var(--muted);" th:text="${doc.fileName}"></div>
+        </td>
+        <td style="font-size:13px;color:var(--ink);font-weight:600;" th:text="${#temporals.format(doc.documentDate, 'dd/MM/yyyy')}"></td>
+        <td style="font-size:13px;max-width:320px;" th:text="${doc.reunionOrdreDuJour ?: 'Non précisé'}"></td>
+        <td style="font-size:12px;color:var(--muted);" th:text="${doc.uploadedBy != null ? doc.uploadedBy.firstName + ' ' + doc.uploadedBy.lastName : 'Direction'}"></td>
+        <td style="text-align:right;">
+          <!-- تحميل مباشر بواسطة الـ ID -->
+          <a th:href="@{/documents/download/id/{id}(id=${doc.id})}" class="btn btn-secondary btn-sm">
+            <i class="ti ti-download"></i> Télécharger le PV
+          </a>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(documents)}">
+        <td colspan="5" style="text-align:center;padding:40px;color:var(--muted);">
+          Aucun procès-verbal archivé pour l'instant.
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+</body>
+</html>

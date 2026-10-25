@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Publications</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<div class="pubnav">
+    <a href="/" class="brand"><div class="brand-icon"><i class="ti ti-flask"></i></div>LIAS Lab</a>
+    <div class="pubnav-links">
+        <a href="/">Accueil</a>
+        <a href="/equipes">Équipes</a>
+        <a href="/activites">Activités</a>
+        <a href="/publications-publiques" class="active">Publications</a>
+    </div>
+    <a href="/login" class="login-btn"><i class="ti ti-login-2"></i>Connexion</a>
+</div>
+
+<div class="pub-content">
+    <div class="pub-page-title">Publications scientifiques</div>
+    <div class="pub-page-sub">Travaux de recherche publiés par les membres du laboratoire LIAS</div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Titre</th>
+            <th>Type</th>
+            <th>Année</th>
+            <th>Journal / Conférence</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="publication : ${publications}">
+            <td style="font-weight:600;color:var(--emerald);" th:text="${publication.title}"></td>
+            <td><span class="badge badge-conference" th:text="${publication.pubType}"></span></td>
+            <td th:text="${publication.pubYear}"></td>
+            <td style="color:var(--muted);" th:text="${publication.journal}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer-pub">© 2026 Laboratoire LIAS — Faculté des Sciences Ben M'Sik</div>
+
+</body>
+</html>

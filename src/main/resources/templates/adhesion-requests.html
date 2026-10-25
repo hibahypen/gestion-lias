@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Demandes d'adhésion</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <div class="page-header-label">Gouvernance</div>
+            <h1 class="page-header-title">Demandes d'adhésion</h1>
+        </div>
+        <span class="badge badge-doctorant" th:if="${pendingCount > 0}" th:text="${pendingCount} + ' en attente'">0 en attente</span>
+    </div>
+</div>
+
+<div class="content">
+    <div class="panel">
+        <table>
+            <thead>
+            <tr>
+                <th>Candidat</th>
+                <th>Email</th>
+                <th>Équipe souhaitée</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th style="text-align:right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${requests}">
+                <td>
+                    <div style="font-weight:600;" th:text="${r.firstName + ' ' + r.lastName}"></div>
+                    <div style="font-size:12px;color:var(--muted);max-width:320px;" th:text="${#strings.abbreviate(r.motivationLetter, 80)}"></div>
+                </td>
+                <td style="color:var(--muted);font-size:13px;" th:text="${r.email}"></td>
+                <td style="font-size:13px;" th:text="${r.teamWanted}"></td>
+                <td style="font-size:13px;" th:text="${r.dateSubmission}"></td>
+                <td>
+                    <span th:if="${r.status.name() == 'EN_ATTENTE'}" class="badge badge-doctorant">En attente</span>
+                    <span th:if="${r.status.name() == 'ACCEPTEE'}" class="badge badge-permanent">Acceptée</span>
+                    <span th:if="${r.status.name() == 'REFUSEE'}" class="badge badge-ancien">Refusée</span>
+                </td>
+                <td style="text-align:right;">
+                    <div th:if="${r.status.name() == 'EN_ATTENTE'}" style="display:flex;gap:8px;justify-content:flex-end;">
+                        <a th:href="@{/adhesion-requests/accept/{id}(id=${r.id})}" class="btn btn-gold btn-sm">
+                            <i class="ti ti-check"></i> Accepter
+                        </a>
+                        <form method="post" th:action="@{/adhesion-requests/refuse/{id}(id=${r.id})}"  style="display:inline;" onsubmit="return confirm('Refuser cette demande ?')"><button type="submit"   class="btn btn-danger btn-sm"
+                          >
+                            <i class="ti ti-x"></i> Refuser
+                        </button></form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(requests)}">
+                <td colspan="6" style="text-align:center;padding:50px;color:var(--muted);">
+                    <i class="ti ti-inbox" style="font-size:36px;display:block;margin-bottom:10px;opacity:0.3;"></i>
+                    Aucune demande d'adhésion
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

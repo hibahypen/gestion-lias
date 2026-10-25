@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Demande envoyée</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav class="pubnav">
+    <a href="/" class="brand">
+        <div class="brand-icon"><i class="ti ti-flask"></i></div>
+        <span>LIAS LAB</span>
+    </a>
+    <div class="pubnav-links">
+        <a href="/">Accueil</a>
+    </div>
+    <a href="/login" class="login-btn">Espace Membre</a>
+</nav>
+
+<div class="content" style="max-width:600px;margin:80px auto;text-align:center;">
+    <div class="panel">
+        <i class="ti ti-circle-check" style="font-size:48px;color:var(--emerald);"></i>
+        <h2 style="margin:16px 0 8px;color:var(--emerald);">Demande envoyée avec succès</h2>
+        <p style="color:var(--muted);">
+            Votre demande d'adhésion a été transmise au Directeur du laboratoire.
+            Vous recevrez une réponse après examen de votre dossier.
+        </p>
+        <a href="/" class="btn btn-gold" style="margin-top:16px;display:inline-flex;">
+            <i class="ti ti-home"></i> Retour à l'accueil
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

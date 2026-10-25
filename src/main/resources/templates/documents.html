@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>LIAS - Archivage Documentaire</title>
+  <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-header-label">Mémoire institutionnelle</div>
+      <h1 class="page-header-title">Archivage Documentaire & Procès-Verbaux</h1>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Formulaire d'upload / création -->
+  <div class="panel">
+    <div class="panel-title"><i class="ti ti-upload" style="color:var(--copper);"></i> Déposer un nouveau document ou PV</div>
+    <form th:action="@{/documents/upload}" method="post" enctype="multipart/form-data">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Intitulé du document</label>
+          <input type="text" name="title" required placeholder="Ex: PV Réunion de laboratoire...">
+        </div>
+        <div class="form-group">
+          <label>Type de document</label>
+          <select name="docType" required>
+            <option th:each="t : ${types}" th:value="${t}" th:text="${t}"></option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date du document</label>
+          <input type="date" name="docDate" required>
+        </div>
+        <div class="form-group">
+          <label>Événement associé (optionnel)</label>
+          <select name="eventId">
+            <option value="">-- Aucun --</option>
+            <option th:each="e : ${events}" th:value="${e.id}" th:text="${e.title}"></option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label>Fichier à archiver (PDF, DOCX, ZIP...)</label>
+          <input type="file" name="file" required style="padding:8px;">
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label>Ordre du jour / Notes (obligatoire pour PV)</label>
+          <textarea name="ordreDuJour" rows="2" placeholder="Ordre du jour de la réunion, contexte..."></textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-gold"><i class="ti ti-cloud-upload"></i> Archiver le document</button>
+    </form>
+  </div>
+
+  <!-- Tableau des archives -->
+  <div class="panel">
+    <div class="panel-title"><i class="ti ti-folders" style="color:var(--copper);"></i> Documents archivés</div>
+    <table>
+      <thead>
+      <tr>
+        <th>Document</th>
+        <th>Type</th>
+        <th>Date</th>
+        <th>Événement / Contexte</th>
+        <th>Déposé par</th>
+        <th style="text-align:right;">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="d : ${documents}">
+        <td>
+          <div style="font-weight:600;color:var(--ink);" th:text="${d.title}"></div>
+          <div style="font-size:12px;color:var(--muted);" th:text="${d.fileName}"></div>
+        </td>
+        <td>
+          <span class="badge badge-permanent" th:text="${d.docType}"></span>
+        </td>
+        <td style="font-size:13px;color:var(--muted);" th:text="${#temporals.format(d.documentDate, 'dd/MM/yyyy')}"></td>
+        <td>
+          <span th:if="${d.event != null}" style="font-size:13px;font-weight:600;color:var(--emerald);" th:text="${d.event.title}"></span>
+          <span th:if="${d.event == null and d.reunionOrdreDuJour != null}" style="font-size:12px;color:var(--muted);" th:text="${#strings.abbreviate(d.reunionOrdreDuJour, 40)}"></span>
+          <span th:if="${d.event == null and d.reunionOrdreDuJour == null}" style="color:var(--muted);">—</span>
+        </td>
+        <td style="font-size:13px;" th:text="${d.uploadedBy != null ? d.uploadedBy.firstName + ' ' + d.uploadedBy.lastName : 'Système'}"></td>
+        <td style="text-align:right;">
+          <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <a th:href="${d.fileDownloadUri}" class="btn btn-secondary btn-sm" download>
+              <i class="ti ti-download"></i> Télécharger
+            </a>
+            <form sec:authorize="hasAnyRole('ADMIN','DIRECTEUR')" method="post" th:action="@{/documents/delete/{id}(id=${d.id})}" style="display:inline;" onsubmit="return confirm('Supprimer ce document ?')"><button type="submit" class="btn btn-danger btn-sm">
+              <i class="ti ti-trash"></i>
+            </button></form>
+          </div>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(documents)}">
+        <td colspan="6" style="text-align:center;padding:50px;color:var(--muted);">
+          <i class="ti ti-folder-off" style="font-size:36px;display:block;margin-bottom:10px;opacity:0.3;"></i>
+          Aucun document archivé
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+</body>
+</html>

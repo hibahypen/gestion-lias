@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Accepter la demande</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <div class="page-header-label">Adhésions</div>
+            <h1 class="page-header-title">Accepter la demande</h1>
+        </div>
+        <a href="/adhesion-requests" class="btn btn-secondary"><i class="ti ti-arrow-left"></i> Retour</a>
+    </div>
+</div>
+
+<div class="content">
+    <div class="panel" style="max-width:600px;">
+        <div style="margin-bottom:20px;">
+            <div style="font-weight:700;font-size:16px;" th:text="${request.firstName + ' ' + request.lastName}"></div>
+            <div style="color:var(--muted);font-size:13px;" th:text="${request.email}"></div>
+            <p style="margin-top:10px;" th:text="${request.motivationLetter}"></p>
+        </div>
+
+        <form th:action="@{/adhesion-requests/accept/{id}(id=${request.id})}" method="post">
+            <div class="form-group">
+                <label>Statut initial du membre</label>
+                <select name="statut" required>
+                    <option value="PERMANENT">Permanent</option>
+                    <option value="ASSOCIE">Associé</option>
+                    <option value="DOCTORANT" selected>Doctorant</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button type="submit" class="btn btn-gold"><i class="ti ti-check"></i> Confirmer l'acceptation</button>
+                <a href="/adhesion-requests" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

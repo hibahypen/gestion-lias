@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>LIAS | Rapport annuel d'activité</title>
+
+  <link rel="stylesheet" th:href="@{/style.css}">
+
+  <style>
+        :root {
+            --report-ink: #172b3a;
+            --report-muted: #728092;
+            --report-border: #e5eaf0;
+            --report-bg: #f4f7fb;
+            --report-green: #087f68;
+            --report-gold: #b88a43;
+            --report-blue: #4263a8;
+            --report-purple: #7956a8;
+            --report-radius: 16px;
+            --report-shadow: 0 5px 22px rgba(28, 45, 70, .045);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--report-bg);
+            color: var(--report-ink);
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; }
+
+        .report-page {
+            width: min(1440px, 100%);
+            margin: 0 auto;
+            padding: 26px 34px 44px;
+        }
+
+        /* Navigation */
+        .navbar {
+            min-height: 70px;
+            padding: 0 30px;
+            background: #fff;
+            border-bottom: 1px solid var(--report-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .navbar-left, .navbar-right,
+        .navlinks, .brand {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-left { gap: 35px; }
+        .navlinks { gap: 6px; flex-wrap: wrap; }
+        .brand { gap: 10px; color: var(--report-ink); font-weight: 800; }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: #e3f3ee;
+            color: var(--report-green);
+            display: grid;
+            place-items: center;
+            font-size: 21px;
+        }
+
+        .navlinks a {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 12px;
+            border-radius: 9px;
+            color: #637185;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background .2s, color .2s;
+        }
+
+        .navlinks a:hover { background: #f2f6f9; color: var(--report-ink); }
+
+        .navlinks a.active {
+            background: #e8f4f0;
+            color: var(--report-green);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+
+        .btn-secondary {
+            color: #475569;
+            background: white;
+            border-color: var(--report-border);
+        }
+
+        .btn-primary {
+            color: white;
+            background: var(--report-green);
+            box-shadow: 0 4px 12px rgba(8, 127, 104, .16);
+        }
+
+        /* Page heading */
+        .page-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 22px;
+            margin-bottom: 26px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--report-green);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--report-green);
+            border-radius: 50%;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: clamp(27px, 3vw, 37px);
+            line-height: 1.2;
+            letter-spacing: -1.1px;
+            font-weight: 800;
+            color: var(--report-ink);
+        }
+
+        .page-subtitle {
+            margin: 10px 0 0;
+            color: var(--report-muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .heading-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .year-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px 6px 13px;
+            background: white;
+            border: 1px solid var(--report-border);
+            border-radius: 11px;
+        }
+
+        .year-control label {
+            color: var(--report-muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .year-control select {
+            border: none;
+            outline: none;
+            background: white;
+            color: var(--report-ink);
+            padding: 7px 5px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* Laboratory identity */
+        .identity-card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            padding: 27px 30px;
+            margin-bottom: 24px;
+            background: linear-gradient(115deg, #ffffff 0%, #f0f8f5 100%);
+            border: 1px solid #dcece6;
+            border-radius: var(--report-radius);
+            box-shadow: var(--report-shadow);
+        }
+
+        .identity-card::after {
+            content: "";
+            position: absolute;
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            border: 30px solid rgba(8, 127, 104, .045);
+            right: -65px;
+            top: -85px;
+            pointer-events: none;
+        }
+
+        .identity-main {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+            min-width: 0;
+        }
+
+        .identity-icon {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: var(--report-green);
+            color: white;
+            font-size: 27px;
+            box-shadow: 0 7px 18px rgba(8, 127, 104, .18);
+        }
+
+        .identity-label {
+            color: var(--report-green);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .identity-name {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        .identity-address {
+            margin-top: 5px;
+            color: var(--report-muted);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .identity-meta {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 10px;
+            min-width: 205px;
+            font-size: 12px;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .meta-label { color: var(--report-muted); }
+        .meta-value { text-align: right; font-weight: 700; }
+
+        /* Statistics */
+        .section-overline {
+            color: var(--report-muted);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 13px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            position: relative;
+            overflow: hidden;
+            padding: 21px;
+            background: white;
+            border: 1px solid var(--report-border);
+            border-radius: var(--report-radius);
+            box-shadow: var(--report-shadow);
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-icon {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            border-radius: 13px;
+            font-size: 21px;
+        }
+
+        .kpi-icon.green { background: #e4f5ef; color: #087f68; }
+        .kpi-icon.blue { background: #eaf0ff; color: #4263a8; }
+        .kpi-icon.gold { background: #fbf1df; color: #ae7a26; }
+        .kpi-icon.purple { background: #f0eafa; color: #7956a8; }
+
+        .kpi-period {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--report-muted);
+            background: #f4f6f9;
+            padding: 6px 8px;
+            border-radius: 7px;
+        }
+
+        .kpi-number {
+            margin: 0;
+            font-size: 35px;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            font-weight: 800;
+            color: var(--report-ink);
+            overflow-wrap: anywhere;
+        }
+
+        .kpi-label {
+            margin-top: 8px;
+            color: var(--report-muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .kpi-bottom {
+            margin-top: 17px;
+            padding-top: 13px;
+            border-top: 1px solid #eef1f5;
+            color: #687789;
+            font-size: 11px;
+        }
+
+        /* Content sections */
+        .report-section {
+            margin-bottom: 24px;
+            padding: 25px;
+            background: white;
+            border: 1px solid var(--report-border);
+            border-radius: var(--report-radius);
+            box-shadow: var(--report-shadow);
+            min-width: 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 21px;
+        }
+
+        .section-title-wrap {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+        }
+
+        .section-icon {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            background: #e8f4f0;
+            color: var(--report-green);
+            font-size: 21px;
+        }
+
+        .section-title {
+            margin: 1px 0 5px;
+            color: var(--report-ink);
+            font-size: 17px;
+            line-height: 1.4;
+            font-weight: 800;
+        }
+
+        .section-description {
+            margin: 0;
+            color: var(--report-muted);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .section-number {
+            color: #c5cdd7;
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .distribution {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 19px;
+        }
+
+        .distribution-label {
+            width: 100%;
+            margin-bottom: 3px;
+            color: #718095;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .report-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            max-width: 100%;
+            padding: 7px 11px;
+            border: 1px solid #e3eee9;
+            border-radius: 8px;
+            background: #f0f8f4;
+            color: #236c59;
+            font-size: 11px;
+            line-height: 1.5;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .report-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .report-badge.status {
+            color: #52678f;
+            background: #f0f3fa;
+            border-color: #e0e7f4;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--report-border);
+            border-radius: 11px;
+        }
+
+        .report-table {
+            width: 100%;
+            min-width: 590px;
+            border-collapse: separate;
+            border-spacing: 0;
+            text-align: left;
+        }
+
+        .report-table th {
+            padding: 14px 16px;
+            background: #f6f8fb;
+            border-bottom: 1px solid var(--report-border);
+            color: #718095;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .report-table td {
+            padding: 15px 16px;
+            border-bottom: 1px solid #edf0f4;
+            color: #526174;
+            font-size: 12px;
+            line-height: 1.65;
+            vertical-align: middle;
+        }
+
+        .report-table tbody tr:last-child td { border-bottom: none; }
+        .report-table tbody tr:nth-child(even) { background: #fbfcfe; }
+        .report-table tbody tr:hover { background: #f2f8f5; }
+
+        .cell-primary {
+            color: var(--report-ink) !important;
+            font-weight: 700;
+        }
+
+        .type-label {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 6px;
+            background: #eef3fa;
+            color: #49618a;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            padding: 28px 15px !important;
+            color: #8491a2 !important;
+            text-align: center;
+            font-size: 12px !important;
+        }
+
+        .empty-icon {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 22px;
+            color: #b0bbc8;
+        }
+
+        /* Footer */
+        .report-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 19px 2px 0;
+            border-top: 1px solid #dfe5ec;
+            color: #8793a2;
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .footer-brand {
+            color: #546477;
+            font-weight: 800;
+            letter-spacing: .7px;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 1000px) {
+            .navbar { padding: 15px 20px; flex-wrap: wrap; }
+            .navbar-left { gap: 15px; flex-wrap: wrap; }
+            .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .report-page { padding: 24px 22px 35px; }
+        }
+
+        @media (max-width: 650px) {
+            .navbar { align-items: flex-start; }
+            .navbar-left { width: 100%; }
+            .navlinks { width: 100%; }
+            .navbar-right { width: 100%; }
+            .report-page { padding: 22px 14px 30px; }
+            .page-heading { align-items: flex-start; }
+            .heading-actions { width: 100%; }
+            .year-control { flex: 1; justify-content: space-between; }
+            .heading-actions > .btn { flex: 1; }
+            .identity-card { padding: 20px; align-items: flex-start; flex-direction: column; }
+            .identity-meta { width: 100%; min-width: 0; padding-top: 15px; border-top: 1px solid #dcece6; }
+            .kpi-grid { gap: 10px; }
+            .kpi-card { padding: 15px; }
+            .kpi-number { font-size: 29px; }
+            .kpi-top { margin-bottom: 15px; }
+            .kpi-period { display: none; }
+            .report-section { padding: 17px 13px; }
+            .section-title { font-size: 15px; }
+            .section-number { font-size: 22px; }
+            .section-header { margin-bottom: 17px; }
+        }
+
+        @media (max-width: 360px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Professional print / PDF */
+        @page {
+            size: A4 landscape;
+            margin: 12mm;
+        }
+
+        @media print {
+            :root {
+                --report-ink: #172b3a;
+                --report-muted: #667085;
+                --report-border: #dce2e8;
+            }
+
+            body {
+                background: white !important;
+                color: #172b3a !important;
+                font-size: 10pt;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .navbar, .no-print, .heading-actions { display: none !important; }
+
+            .report-page {
+                width: 100%;
+                max-width: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .page-heading { margin-bottom: 15px; }
+            .page-title { font-size: 25px; }
+            .page-subtitle { font-size: 10px; }
+
+            .identity-card, .kpi-card, .report-section {
+                box-shadow: none !important;
+                break-inside: avoid;
+            }
+
+            .identity-card {
+                padding: 15px 20px;
+                margin-bottom: 14px;
+            }
+
+            .identity-icon { width: 45px; height: 45px; }
+            .identity-name { font-size: 15px; }
+
+            .kpi-grid { gap: 10px; margin-bottom: 15px; }
+            .kpi-card { padding: 13px; }
+            .kpi-number { font-size: 27px; }
+            .kpi-top { margin-bottom: 10px; }
+            .kpi-icon { width: 33px; height: 33px; }
+
+            .report-section {
+                padding: 16px;
+                margin-bottom: 14px;
+            }
+
+            .section-header { margin-bottom: 12px; }
+            .section-icon { width: 34px; height: 34px; }
+            .section-title { font-size: 13px; }
+
+            .table-wrap { overflow: visible; }
+            .report-table { min-width: 0; }
+            .report-table th { padding: 8px; font-size: 8px; }
+            .report-table td { padding: 8px; font-size: 9px; }
+            .report-badge { padding: 4px 7px; font-size: 9px; }
+
+            .report-footer { margin-top: 15px; }
+            a { color: inherit !important; }
+            tr { break-inside: avoid; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar no-print">
+  <div class="navbar-left">
+    <a th:href="@{/dashboard}" class="brand">
+      <div class="brand-icon"><i class="ti ti-flask"></i></div>
+      <span>LIAS</span>
+    </a>
+
+    <div class="navlinks">
+      <a th:href="@{/dashboard}">
+        <i class="ti ti-layout-dashboard"></i> Dashboard
+      </a>
+      <a th:href="@{/members}">
+        <i class="ti ti-users"></i> Membres
+      </a>
+      <a th:href="@{/events}">
+        <i class="ti ti-calendar-event"></i> Événements
+      </a>
+      <a th:href="@{/publications}">
+        <i class="ti ti-book"></i> Publications
+      </a>
+      <a th:href="@{/reports}" class="active">
+        <i class="ti ti-file-analytics"></i> Rapport annuel
+      </a>
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <form th:action="@{/logout}" method="post">
+      <button type="submit" class="btn btn-secondary">
+        <i class="ti ti-logout"></i> Déconnexion
+      </button>
+    </form>
+  </div>
+</nav>
+
+<main class="report-page">
+
+  <!-- Page heading -->
+  <header class="page-heading">
+    <div>
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        PILOTAGE &amp; GOUVERNANCE
+      </div>
+
+      <h1 class="page-title">
+        Rapport annuel d'activité
+        <span th:text="${year}">2026</span>
+      </h1>
+
+      <p class="page-subtitle">
+        Synthèse des activités scientifiques et de l'évolution
+        des ressources humaines du laboratoire.
+      </p>
+    </div>
+
+    <div class="heading-actions no-print">
+      <form th:action="@{/reports}" method="get" class="year-control">
+        <label for="reportYear">Exercice</label>
+        <select id="reportYear" name="year" onchange="this.form.submit()">
+          <option th:each="y : ${years}"
+                  th:value="${y}"
+                  th:text="${y}"
+                  th:selected="${y == year}">
+          </option>
+        </select>
+      </form>
+
+      <button type="button" class="btn btn-primary"
+              onclick="window.print()">
+        <i class="ti ti-file-download"></i>
+        Exporter en PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Laboratory identity -->
+  <section class="identity-card">
+    <div class="identity-main">
+      <div class="identity-icon">
+        <i class="ti ti-building-community"></i>
+      </div>
+
+      <div>
+        <div class="identity-label">Établissement de recherche</div>
+        <h2 class="identity-name">Laboratoire LIAS</h2>
+        <div class="identity-address">
+          Faculté des Sciences Ben M'Sik · Casablanca
+        </div>
+      </div>
+    </div>
+
+    <div class="identity-meta">
+      <div class="meta-row">
+        <span class="meta-label">Directeur du laboratoire</span>
+        <strong class="meta-value"
+                th:text="${directeur != null ? directeur : 'Non défini'}">
+          Non défini
+        </strong>
+      </div>
+
+      <div class="meta-row">
+        <span class="meta-label">Période du rapport</span>
+        <strong class="meta-value">
+          01/01/<span th:text="${year}">2026</span>
+          — 31/12/<span th:text="${year}">2026</span>
+        </strong>
+      </div>
+
+      <div class="meta-row">
+        <span class="meta-label">Date de génération</span>
+        <strong class="meta-value" th:text="${generatedOn}">
+          2026-01-01
+        </strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key performance indicators -->
+  <div class="section-overline">Vue d'ensemble · Indicateurs clés</div>
+
+  <section class="kpi-grid" aria-label="Indicateurs du rapport">
+
+    <article class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-icon green">
+          <i class="ti ti-calendar-event"></i>
+        </div>
+        <span class="kpi-period">ACTIVITÉ</span>
+      </div>
+
+      <p class="kpi-number" th:text="${#lists.size(events)}">0</p>
+      <div class="kpi-label">Événements scientifiques</div>
+      <div class="kpi-bottom">Activités recensées pour l'exercice</div>
+    </article>
+
+    <article class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-icon blue">
+          <i class="ti ti-book-2"></i>
+        </div>
+        <span class="kpi-period">PRODUCTION</span>
+      </div>
+
+      <p class="kpi-number" th:text="${#lists.size(publications)}">0</p>
+      <div class="kpi-label">Publications scientifiques</div>
+      <div class="kpi-bottom">Production scientifique recensée</div>
+    </article>
+
+    <article class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-icon gold">
+          <i class="ti ti-user-plus"></i>
+        </div>
+        <span class="kpi-period">ÉVOLUTION</span>
+      </div>
+
+      <p class="kpi-number" th:text="${#lists.size(newMembers)}">0</p>
+      <div class="kpi-label">Nouvelles affiliations</div>
+      <div class="kpi-bottom">
+        Entrées enregistrées sur la période
+      </div>
+    </article>
+
+    <article class="kpi-card">
+      <div class="kpi-top">
+        <div class="kpi-icon purple">
+          <i class="ti ti-users"></i>
+        </div>
+        <span class="kpi-period">EFFECTIF</span>
+      </div>
+
+      <p class="kpi-number" th:text="${totalMembers}">0</p>
+      <div class="kpi-label">Membres du laboratoire</div>
+      <div class="kpi-bottom">Effectif total enregistré</div>
+    </article>
+
+  </section>
+
+  <!-- Section 1: Events -->
+  <section class="report-section">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <div class="section-icon">
+          <i class="ti ti-calendar-event"></i>
+        </div>
+        <div>
+          <h2 class="section-title">Événements scientifiques</h2>
+          <p class="section-description">
+            Manifestations et activités scientifiques recensées
+            durant l'année sélectionnée.
+          </p>
+        </div>
+      </div>
+      <div class="section-number">01</div>
+    </div>
+
+    <div class="distribution"
+         th:if="${eventsByType != null and !eventsByType.isEmpty()}">
+      <div class="distribution-label">Répartition par type</div>
+      <span class="report-badge"
+            th:each="entry : ${eventsByType}"
+            th:text="${entry.key + ' : ' + entry.value}">
+                Type : 0
+            </span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="report-table">
+        <thead>
+        <tr>
+          <th>Date</th>
+          <th>Intitulé de l'événement</th>
+          <th>Type</th>
+          <th>Organisateur</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="e : ${events}">
+          <td th:text="${e.eventDate != null ? e.eventDate : '—'}">
+            —
+          </td>
+
+          <td class="cell-primary"
+              th:text="${e.title != null ? e.title : 'Sans titre'}">
+            Événement
+          </td>
+
+          <td>
+                        <span class="type-label"
+                              th:text="${e.type != null ? e.type : 'Non précisé'}">
+                            Type
+                        </span>
+          </td>
+
+          <td th:text="${#strings.isEmpty(e.organizersLabel) ? 'Non renseigné' : e.organizersLabel}">
+            Organisateur
+          </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(events)}">
+          <td colspan="4" class="empty-state">
+            <i class="ti ti-calendar-off empty-icon"></i>
+            Aucun événement enregistré pour cette année.
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 2: Publications -->
+  <section class="report-section">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <div class="section-icon"
+             style="background:#edf1ff;color:#4263a8;">
+          <i class="ti ti-book-2"></i>
+        </div>
+        <div>
+          <h2 class="section-title">Production scientifique</h2>
+          <p class="section-description">
+            Publications enregistrées et types de production
+            scientifique du laboratoire.
+          </p>
+        </div>
+      </div>
+      <div class="section-number">02</div>
+    </div>
+
+    <div class="distribution"
+         th:if="${pubsByType != null and !pubsByType.isEmpty()}">
+      <div class="distribution-label">Répartition par type de publication</div>
+      <span class="report-badge"
+            th:each="entry : ${pubsByType}"
+            th:text="${entry.key + ' : ' + entry.value}">
+                Type : 0
+            </span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="report-table">
+        <thead>
+        <tr>
+          <th>Titre de la publication</th>
+          <th>Type</th>
+          <th>Journal / Conférence</th>
+          <th>Auteur associé</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="p : ${publications}">
+          <td class="cell-primary"
+              th:text="${p.title != null ? p.title : 'Sans titre'}">
+            Publication
+          </td>
+
+          <td>
+                        <span class="type-label"
+                              th:text="${p.pubType != null ? p.pubType : 'Non précisé'}">
+                            Type
+                        </span>
+          </td>
+
+          <td th:text="${p.journal != null and !#strings.isEmpty(p.journal)
+                        ? p.journal : 'Non renseigné'}">
+            Journal
+          </td>
+
+          <td th:text="${p.addedBy != null
+                        ? p.addedBy.firstName + ' ' + p.addedBy.lastName
+                        : 'Non renseigné'}">
+            Auteur
+          </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(publications)}">
+          <td colspan="4" class="empty-state">
+            <i class="ti ti-book-off empty-icon"></i>
+            Aucune publication enregistrée pour cette année.
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 3: Human resources -->
+  <section class="report-section">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <div class="section-icon"
+             style="background:#fbf1df;color:#ae7a26;">
+          <i class="ti ti-users-group"></i>
+        </div>
+        <div>
+          <h2 class="section-title">Ressources humaines</h2>
+          <p class="section-description">
+            Composition des effectifs et évolution des affiliations
+            au sein du laboratoire.
+          </p>
+        </div>
+      </div>
+      <div class="section-number">03</div>
+    </div>
+
+    <div class="distribution"
+         th:if="${membersByStatus != null and !membersByStatus.isEmpty()}">
+      <div class="distribution-label">Répartition actuelle par statut</div>
+      <span class="report-badge status"
+            th:each="entry : ${membersByStatus}"
+            th:text="${entry.key + ' : ' + entry.value}">
+                Statut : 0
+            </span>
+    </div>
+
+    <div class="distribution"
+         th:if="${membersByStatus == null or membersByStatus.isEmpty()}">
+      <div class="distribution-label">Répartition actuelle par statut</div>
+      <span class="report-badge status">
+                Aucune donnée de répartition disponible
+            </span>
+    </div>
+
+    <div class="distribution-label" style="margin-bottom:12px;">
+      Nouvelles affiliations de l'année
+      <span th:text="${year}">2026</span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="report-table">
+        <thead>
+        <tr>
+          <th>Nom du membre</th>
+          <th>Statut</th>
+          <th>Date d'affiliation</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="m : ${newMembers}">
+          <td class="cell-primary"
+              th:text="${m.firstName + ' ' + m.lastName}">
+            Nom du membre
+          </td>
+
+          <td>
+                        <span class="type-label"
+                              th:text="${m.status != null ? m.status : 'Non précisé'}">
+                            Statut
+                        </span>
+          </td>
+
+          <td th:text="${m.dateAffiliation != null
+                        ? m.dateAffiliation : 'Non renseignée'}">
+            Date
+          </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(newMembers)}">
+          <td colspan="3" class="empty-state">
+            <i class="ti ti-user-search empty-icon"></i>
+            Aucune nouvelle affiliation enregistrée pour cette année.
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Report footer -->
+  <footer class="report-footer">
+    <div>
+      <div class="footer-brand">LIAS · LABORATOIRE DE RECHERCHE</div>
+      <div>Faculté des Sciences Ben M'Sik, Casablanca</div>
+    </div>
+
+    <div style="text-align:right;">
+      Document généré par la plateforme de gestion LIAS<br>
+      <span>Rapport annuel · Exercice </span>
+      <strong th:text="${year}">2026</strong>
+    </div>
+  </footer>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Mon profil</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <div class="page-header-label">Profil</div>
+            <h1 class="page-header-title">Mon profil</h1>
+        </div>
+        <a href="/dashboard" class="btn btn-secondary"><i class="ti ti-arrow-left"></i> Retour</a>
+    </div>
+</div>
+
+<div class="content">
+
+    <div th:if="${param.success}" class="panel" style="background:#EAF3DE;border:1px solid #B8DCAA;color:#2D6A0A;max-width:900px;">
+        <i class="ti ti-check"></i> Profil mis à jour avec succès.
+    </div>
+
+    <div class="panel" style="max-width:900px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+            <div style="width:64px;height:64px;border-radius:50%;background:var(--emerald);color:white;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;overflow:hidden;">
+                <img th:if="${member.photoUrl != null and !member.photoUrl.isEmpty()}" th:src="${member.photoUrl}" style="width:100%;height:100%;object-fit:cover;">
+                <span th:unless="${member.photoUrl != null and !member.photoUrl.isEmpty()}"
+                      th:text="${#strings.toUpperCase(#strings.substring(member.firstName,0,1) + #strings.substring(member.lastName,0,1))}">AB</span>
+            </div>
+            <div>
+                <div style="font-weight:700;font-size:18px;" th:text="${member.firstName + ' ' + member.lastName}"></div>
+                <div style="color:var(--muted);font-size:13px;" th:text="${member.email}"></div>
+                <div style="margin-top:6px;">
+                    <span class="badge badge-permanent" th:text="${member.status}"></span>
+                    <span class="badge badge-associe" th:text="${member.role}"></span>
+                </div>
+            </div>
+        </div>
+
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">
+            💡 Email, statut, rôle et équipe sont gérés par l'administrateur du laboratoire. Vous pouvez modifier
+            librement vos informations personnelles ci-dessous.
+        </p>
+
+        <form th:action="@{/profile/save}" th:object="${member}" method="post">
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{email}">
+            <input type="hidden" th:field="*{status}">
+            <input type="hidden" th:field="*{role}">
+            <input type="hidden" th:field="*{team}">
+            <input type="hidden" th:field="*{active}">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Prénom</label>
+                    <input type="text" th:field="*{firstName}">
+                </div>
+                <div class="form-group">
+                    <label>Nom</label>
+                    <input type="text" th:field="*{lastName}">
+                </div>
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="text" th:field="*{telephone}" placeholder="Ex: 06 12 34 56 78">
+                </div>
+                <div class="form-group">
+                    <label>Spécialité</label>
+                    <input type="text" th:field="*{specialite}" placeholder="Ex: Machine Learning">
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label>Photo (lien / URL)</label>
+                    <input type="text" th:field="*{photoUrl}" placeholder="https://...">
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label>Centres d'intérêt</label>
+                    <input type="text" th:field="*{centresInteret}" placeholder="Ex: IA, Big Data, Réseaux">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Biographie</label>
+                <textarea th:field="*{biography}" rows="4" placeholder="Présentez-vous en quelques lignes..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Nouveau mot de passe <span style="font-weight:400;color:var(--muted);">(laisser vide pour ne pas changer)</span></label>
+                <input type="password" name="newPassword" placeholder="••••••••" autocomplete="new-password">
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button type="submit" class="btn btn-gold"><i class="ti ti-device-floppy"></i> Enregistrer</button>
+                <a sec:authorize="!hasAnyAuthority('STATUT_DOCTORANT','STATUT_ASSOCIE')" th:href="@{/members/view/{id}(id=${member.id})}" class="btn btn-secondary"><i class="ti ti-eye"></i> Voir mon profil public</a>
+                <a href="/dashboard" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="panel" style="max-width:900px;margin-top:20px;">
+        <h3 style="margin-bottom:12px;">Historique de mes modifications</h3>
+        <table>
+            <thead><tr><th>Date</th><th>Champ</th><th>Avant</th><th>Après</th><th>Par</th></tr></thead>
+            <tbody>
+            <tr th:each="h : ${history}">
+                <td th:text="${#temporals.format(h.changedAt,'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${h.fieldName}"></td>
+                <td th:text="${h.oldValue != null ? h.oldValue : '—'}"></td>
+                <td th:text="${h.newValue != null ? h.newValue : '—'}"></td>
+                <td th:text="${h.changedBy}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(history)}"><td colspan="5" style="text-align:center;color:var(--muted);">Aucune modification</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

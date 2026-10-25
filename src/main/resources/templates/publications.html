@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="UTF-8"><title>LIAS - Publications</title><link rel="stylesheet" th:href="@{/style.css}"></head>
+<body>
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+<div class="page-header"><div class="page-header-inner"><h1 class="page-header-title">Publications scientifiques</h1><a href="/publications/new" class="btn btn-gold">Ajouter une publication</a></div></div>
+<div class="content"><div th:if="${param.unauthorized}" class="panel" role="alert">Vous ne pouvez modifier que vos propres publications.</div>
+<div class="panel"><form method="get" th:action="@{/publications}" class="filter-grid">
+<div class="form-group"><label for="authorId">Auteur</label><select id="authorId" name="authorId"><option value="">Tous les auteurs</option><option th:each="a : ${authors}" th:value="${a.id}" th:text="${a.firstName + ' ' + a.lastName}" th:selected="${a.id == selectedAuthor}"></option></select></div>
+<div class="form-group"><label for="year">Année</label><input id="year" name="year" type="number" min="1900" max="2100" th:value="${selectedYear}"></div>
+<div class="form-group"><label for="team">Équipe</label><select id="team" name="team"><option value="">Toutes les équipes</option><option th:each="t : ${teams}" th:value="${t.name}" th:text="${t.name}" th:selected="${t.name == selectedTeam}"></option></select></div>
+<div><button class="btn btn-gold">Filtrer</button> <a href="/publications" class="btn btn-secondary">Réinitialiser</a></div></form></div>
+<div class="panel"><table><thead><tr><th>Titre</th><th>Auteur / Équipe</th><th>Type</th><th>Année</th><th>Journal / Conférence</th><th>Actions</th></tr></thead>
+<tbody>
+<tr th:each="pub : ${publications}">
+    <td>
+        <div style="font-weight:700;color:var(--emerald);max-width:340px;line-height:1.4;" th:text="${pub.title}">Titre</div>
+        <div th:if="${pub.createdAt != null}" style="font-size:11px;color:var(--muted);margin-top:2px;"
+             th:text="'Ajoutée le ' + ${#temporals.format(pub.createdAt, 'dd/MM/yyyy')}"></div>
+    </td>
+    <td>
+        <div th:if="${pub.addedBy != null}">
+            <strong style="color:var(--ink);" th:text="${pub.addedBy.firstName + ' ' + pub.addedBy.lastName}">Auteur</strong>
+            <div style="font-size:12px;color:var(--copper);font-weight:500;" th:text="${pub.addedBy.team ?: 'Sans équipe'}">Équipe</div>
+        </div>
+        <span th:if="${pub.addedBy == null}" style="color:var(--muted);font-style:italic;font-size:12px;">Non assigné</span>
+    </td>
+    <td>
+        <span class="badge badge-conference" th:text="${pub.pubType ?: 'Article'}">Article</span>
+    </td>
+    <td>
+        <span style="font-weight:800;color:var(--emerald);font-size:15px;" th:text="${pub.pubYear}">2026</span>
+    </td>
+    <td style="font-size:13px;color:var(--muted);max-width:220px;" th:text="${pub.journal ?: '—'}">Journal</td>
+
+    <!-- الصلاحيات: فقط صاحب المقال أو الأدمين/المدير من يرى أزرار التعديل والمسح -->
+    <td style="text-align:right;">
+        <div th:if="${(pub.addedBy != null and pub.addedBy.email == #authentication.name) or #authorization.expression('hasAnyRole(''ADMIN'', ''DIRECTEUR'')')}"
+             style="display:flex;gap:6px;justify-content:flex-end;">
+            <a th:href="@{/publications/edit/{id}(id=${pub.id})}" class="btn btn-secondary btn-sm" title="Modifier">
+                <i class="ti ti-edit"></i>
+            </a>
+            <form method="post" th:action="@{/publications/delete/{id}(id=${pub.id})}"  style="display:inline;" onsubmit="return confirm('Supprimer votre publication ?')"><button type="submit"   class="btn btn-danger btn-sm" title="Supprimer">
+                <i class="ti ti-trash"></i>
+            </button></form>
+        </div>
+        <span th:unless="${(pub.addedBy != null and pub.addedBy.email == #authentication.name) or #authorization.expression('hasAnyRole(''ADMIN'', ''DIRECTEUR'')')}"
+              style="color:var(--muted);font-size:11px;font-style:italic;">
+                        Lecture seule
+                    </span>
+    </td>
+</tr>
+<tr th:if="${#lists.isEmpty(publications)}"><td colspan="6">Aucune publication pour ces critères.</td></tr></tbody>
+</table></div></div></body></html>

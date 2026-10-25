@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Directeur</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="hero" style="background:linear-gradient(135deg,#061831,#13315C);">
+    <div style="max-width:1200px;margin:0 auto;">
+        <div class="hero-breadcrumb">Espace Directeur</div>
+        <div class="hero-title">Tableau de bord — Direction</div>
+        <div class="hero-sub">Supervision scientifique et administrative du laboratoire LIAS</div>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div><div class="stat-num" th:text="${permanents}">0</div><div class="stat-label">Permanents</div></div>
+        <div class="stat-card-icon" style="background:#EAF3DE;color:#2D6A0A;"><i class="ti ti-users"></i></div>
+    </div>
+    <div class="stat-card">
+        <div><div class="stat-num" th:text="${doctorants}">0</div><div class="stat-label">Doctorants</div></div>
+        <div class="stat-card-icon" style="background:#E6F1FB;color:#1558A0;"><i class="ti ti-school"></i></div>
+    </div>
+    <div class="stat-card">
+        <div><div class="stat-num" th:text="${events}">0</div><div class="stat-label">Événements</div></div>
+        <div class="stat-card-icon" style="background:#FEF3E2;color:#8A4D0A;"><i class="ti ti-calendar-event"></i></div>
+    </div>
+    <div class="stat-card">
+        <div><div class="stat-num" th:text="${publications}">0</div><div class="stat-label">Publications</div></div>
+        <div class="stat-card-icon" style="background:#EEEDFE;color:#3C3489;"><i class="ti ti-book"></i></div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="panel">
+        <div class="panel-title"><i class="ti ti-bolt" style="color:var(--copper);"></i> Actions du directeur</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+            <a href="/members" style="background:var(--emerald);color:white;border-radius:14px;padding:24px;text-decoration:none;display:flex;flex-direction:column;gap:10px;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                <i class="ti ti-user-check" style="font-size:26px;"></i>
+                <div style="font-weight:700;">Membres</div>
+                <div style="font-size:12px;opacity:0.7;">Consulter les profils</div>
+            </a>
+            <a href="/adhesion-requests" style="background:#8A4D0A;color:white;border-radius:14px;padding:24px;text-decoration:none;display:flex;flex-direction:column;gap:10px;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                <i class="ti ti-user-plus" style="font-size:26px;"></i>
+                <div style="font-weight:700;">Demandes d'adhésion</div>
+                <div style="font-size:12px;opacity:0.7;" th:text="${pendingAdhesions != null ? pendingAdhesions + ' en attente' : '0 en attente'}">0 en attente</div>
+            </a>
+            <a href="/events/new" style="background:var(--copper);color:white;border-radius:14px;padding:24px;text-decoration:none;display:flex;flex-direction:column;gap:10px;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                <i class="ti ti-calendar-plus" style="font-size:26px;"></i>
+                <div style="font-weight:700;">Nouvel événement</div>
+                <div style="font-size:12px;opacity:0.7;">Créer et organiser</div>
+            </a>
+            <a href="/publications" style="background:#1558A0;color:white;border-radius:14px;padding:24px;text-decoration:none;display:flex;flex-direction:column;gap:10px;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                <i class="ti ti-book" style="font-size:26px;"></i>
+                <div style="font-weight:700;">Publications</div>
+                <div style="font-size:12px;opacity:0.7;">Superviser la production</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title"><i class="ti ti-crown" style="color:var(--copper);"></i> Votre mandat</div>
+        <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--sand);border-radius:12px;">
+            <div style="width:48px;height:48px;border-radius:50%;background:#1558A0;color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;">DR</div>
+            <div>
+                <div style="font-weight:700;font-size:15px;color:var(--emerald);" th:text="${directeur != null ? directeur : 'Non défini'}">Non défini</div>
+                <div style="color:var(--muted);font-size:13px;">Directeur du laboratoire LIAS — Mandat actif</div>
+            </div>
+            <span class="badge badge-permanent" style="margin-left:auto;">Actif</span>
+        </div>
+    </div>
+
+    <div class="panel" id="chartsPanel">
+        <div class="panel-title"><i class="ti ti-chart-bar" style="color:var(--copper);"></i> Statistiques du laboratoire</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div style="position:relative;height:260px;">
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div style="position:relative;height:260px;">
+                <canvas id="eventsChart"></canvas>
+            </div>
+            <div style="grid-column:1/-1;position:relative;height:240px;">
+                <canvas id="pubsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/chart.umd.js}"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+const statusData = /*[[${membersByStatus}]]*/ {};
+const eventsData = /*[[${eventsByType}]]*/ {};
+const pubsData = /*[[${publicationsByYear}]]*/ {};
+
+if (typeof Chart === 'undefined') {
+    document.getElementById('chartsPanel').insertAdjacentHTML('beforeend',
+        '<p style="color:#A02D20;">Graphiques indisponibles : le fichier /js/chart.umd.js est introuvable.</p>');
+} else {
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(statusData),
+            datasets: [{
+                data: Object.values(statusData),
+                backgroundColor: ['#2D6A0A', '#1558A0', '#8A4D0A', '#3C3489', '#999999']
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { title: { display: true, text: 'Membres par statut' } }
+        }
+    });
+
+    new Chart(document.getElementById('eventsChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(eventsData),
+            datasets: [{ label: 'Événements', data: Object.values(eventsData), backgroundColor: '#8A4D0A' }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { title: { display: true, text: 'Événements par type' }, legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    new Chart(document.getElementById('pubsChart'), {
+        type: 'line',
+        data: {
+            labels: Object.keys(pubsData),
+            datasets: [{
+                label: 'Publications',
+                data: Object.values(pubsData),
+                borderColor: '#3C3489',
+                backgroundColor: 'rgba(60,52,137,0.15)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { title: { display: true, text: 'Publications par année' } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+}
+/*]]>*/
+</script>
+
+</body>
+</html>

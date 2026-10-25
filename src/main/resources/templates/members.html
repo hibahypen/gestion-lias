@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>LIAS - Membres</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+
+<nav th:replace="~{fragments/navigation :: navbar}"></nav>
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <div class="page-header-label">Laboratoire</div>
+            <h1 class="page-header-title">Membres</h1>
+        </div>
+        <a sec:authorize="hasRole('ADMIN')" href="/members/new" class="btn btn-gold"><i class="ti ti-plus"></i> Nouveau membre</a>
+    </div>
+</div>
+
+<div class="content">
+    <div class="panel">
+        <table>
+            <thead>
+            <tr>
+                <th>Membre</th>
+                <th>Email</th>
+                <th>Statut</th>
+                <th>Équipe</th>
+                <th>État</th>
+                <th style="text-align:right;" sec:authorize="hasRole('ADMIN')">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="member : ${members}"
+                th:style="${!member.active} ? 'opacity:0.5' : ''">
+                <td>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div class="avatar-initials"
+                             th:style="${!member.active} ? 'background:#aaa' : ''">
+                            <span th:if="${member.firstName != null and !#strings.isEmpty(member.firstName)}" th:text="${#strings.toUpperCase(#strings.substring(member.firstName, 0, 1))}">U</span>
+                            <span th:if="${member.lastName != null and !#strings.isEmpty(member.lastName)}" th:text="${#strings.toUpperCase(#strings.substring(member.lastName, 0, 1))}">S</span>
+                        </div>
+                        <div>
+                            <a th:href="@{/members/view/{id}(id=${member.id})}" style="font-weight:600;color:inherit;text-decoration:none;"
+                               th:text="${(member.firstName != null ? member.firstName : '') + ' ' + (member.lastName != null ? member.lastName : '')}"></a>
+                            <div style="font-size:12px;color:var(--muted);" th:text="${member.establishmentOrigin != null ? member.establishmentOrigin : '—'}"></div>
+                        </div>
+                    </div>
+                </td>
+                <td style="color:var(--muted);font-size:13px;" th:text="${member.email != null ? member.email : '—'}"></td>
+                <td>
+                    <span th:if="${member.status != null}"
+                          th:classappend="${member.status.name() == 'PERMANENT' ? 'badge-permanent' :
+                                          member.status.name() == 'DOCTORANT' ? 'badge-doctorant' :
+                                          member.status.name() == 'ASSOCIE' ? 'badge-associe' :
+                                          member.status.name() == 'RETRAITE' ? 'badge-retraite' : 'badge-ancien'}"
+                          class="badge" th:text="${member.status}"></span>
+                    <span th:if="${member.status == null}" class="badge badge-ancien">—</span>
+                </td>
+                <td style="font-size:13px;" th:text="${member.team != null ? member.team : '—'}"></td>
+                <td>
+                    <span th:if="${member.active}" class="badge badge-permanent">Actif</span>
+                    <span th:unless="${member.active}" class="badge badge-ancien">Désactivé</span>
+                </td>
+                <td style="text-align:right;" sec:authorize="hasRole('ADMIN')">
+                    <div style="display:flex;gap:8px;justify-content:flex-end;">
+                        <a th:href="@{/members/edit/{id}(id=${member.id})}" class="btn btn-secondary btn-sm">
+                            <i class="ti ti-edit"></i>
+                        </a>
+                        <form method="post" th:action="@{/members/toggle/{id}(id=${member.id})}"  style="display:inline;"><button type="submit"  
+                           class="btn btn-sm"
+                           th:style="${member.active} ? 'background:#FEF3E2;color:#8A4D0A;border:1px solid #F5D5B0;' : 'background:#EAF3DE;color:#2D6A0A;border:1px solid #B8DCAA;'">
+                            <i th:class="${member.active} ? 'ti ti-lock' : 'ti ti-lock-open'"></i>
+                        </button></form>
+                        <form method="post" th:action="@{/members/delete/{id}(id=${member.id})}"  style="display:inline;" onsubmit="return confirm('Archiver ce membre (statut Ancien, historique conservé) ?')"><button type="submit"  
+                           class="btn btn-danger btn-sm"
+                          >
+                            <i class="ti ti-trash"></i>
+                        </button></form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(members)}">
+                <td colspan="6" style="text-align:center;padding:50px;color:var(--muted);">
+                    <i class="ti ti-users-off" style="font-size:36px;display:block;margin-bottom:10px;opacity:0.3;"></i>
+                    Aucun membre enregistré
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
